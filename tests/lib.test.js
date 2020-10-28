@@ -48,8 +48,16 @@ describe('registerUser', () => {
   it('should throw error if the username is falsy', () => {
     const args = [null, undefined, NaN, '', 0, false];
     args.forEach( a => {
-      expect(() => { liv.registerUser(a) }).toThrow();
+      expect(() => { lib.registerUser(a) }).toThrow();
     });
+
+    for(var b in args) {
+      expect(() => { lib.registerUser(b).toThrow() });
+    };
+    
+    describe.each(args)('Checking if username entry is valid: (%o)', args => {
+      expect(() => lib.registerUser(args).toThrow());
+    })
   });
 
   it('should return a user object if valid username is passed', () => {
