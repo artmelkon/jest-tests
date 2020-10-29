@@ -1,4 +1,6 @@
 const lib = require('../lib');
+const db = require('../db');
+const mail = require('../mail');
 
 describe('absolute', () => {
   it('should return posetive number if the input is posetive', () => {
@@ -54,7 +56,7 @@ describe('registerUser', () => {
     for(var b in args) {
       expect(() => { lib.registerUser(b).toThrow() });
     };
-    
+
     describe.each(args)('Checking if username entry is valid: (%o)', args => {
       expect(() => lib.registerUser(args).toThrow());
     })
@@ -64,5 +66,50 @@ describe('registerUser', () => {
     const result = lib.registerUser('art');
     expect(result).toMatchObject({ username: 'art'});
     expect(result.id).toBeGreaterThan(0);
+  })
+});
+
+describe('applyDiscount', () => {
+  it('should apply 10% discount if customer has more than 10 points', () => {
+    // creating simple fake MOCK function
+    db.getCustomerSync = function(customerId) {
+      console.log('Fake reading customer...')
+      return { id: customerId, points: 20 };
+    }
+    const order = { customerId: 1, totalPrice: 10 }
+    lib.applyDiscount(order);
+    expect(order.totalPrice).toBe(9);
+  });
+});
+
+// MOCK functions
+describe('notifyCustomer', () => {
+  it('should send an email notification to the customer', () => {
+
+    /* Jest MOCK function */
+    db.getCustomerSync = jest.fn().mockReturnValue({ email: 'a' });
+    mail.send = jest.fn();
+
+    const customer = { customerId: 1 };
+    lib.notifyCustomer(customer);
+
+    expect(mail.send).toHaveBeenCalled();
+    expect(mail.send.mock.calls[0][0]).toBe('a');
+    expect(mail.send.mock.calls[0][1]).toMatch(/order/);
+
+    /* Vanilla Javas functions version */
+    // db.getCustomerSync = function(customerId) {
+    //   // 'a' is for test porpouse
+    //   return {id: customerId, email: 'a'}; 
+    // }
+
+    // let mailSent = false;
+    // mail.send = function(email, message) {
+    //   mailSent = true;
+    // }
+
+    // const customer = {customerId: 1};
+    // lib.notifyCustomer(customer);
+    // expect(mailSent).toBe(true)
   })
 })
