@@ -97,7 +97,7 @@ describe('notifyCustomer', () => {
     expect(mail.send.mock.calls[0][0]).toBe('a');
     expect(mail.send.mock.calls[0][1]).toMatch(/order/);
 
-    /* Vanilla Java functions version */
+    /* Vanilla JavaScript functions version */
     // db.getCustomerSync = function(customerId) {
     //   // 'a' is for test porpouse
     //   return {id: customerId, email: 'a'}; 
